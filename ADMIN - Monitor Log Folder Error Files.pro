@@ -1,10 +1,10 @@
 ﻿601,100
 602,"ADMIN - Monitor Log Folder Error Files"
 562,"CHARACTERDELIMITED"
-586,"..\Logs\ErrorFileLogMonitor.txt"
-585,"..\Logs\ErrorFileLogMonitor.txt"
+586,"model_upload/FindTM1ErrorsToFile.ps1"
+585,"model_upload/FindTM1ErrorsToFile.ps1"
 564,
-565,"pK]uM15_K4hVtw][a4VP[YMn>==\ghN@DqHk0x9CqlDv]aqhq8nr=RQK1hEnV[WHLnFPT4ynrjd91CMICSy>tl:QG7KCuZ\l`5Y\akKn49v@xwhwPO?dq94cAsVeWDzPghFDKz^[mp=VlQh\urspBjALyv=uKqXdB58J<wiO_FL?uFLqPd9U6pVbfBaf48lxpNp\0UFq"
+565,"zVx<\TQ2ir^pvgty7o@dLNRL3EaWt3T8=WQiP6Fl9JQDPuVhZCfSwoYkpBjlZ>lTL<6TQGDd9K:Ut1HM7[5b\^aB@tUs8?K;udWyAChqVCBrR`PoPFTWbw6aU6wMlW1y<ulNKL4cr1V7sYGHNs2Rh@y5:8;=yB8Ld32I1gg32hD]kQBl[C@GSQc7rh=cxEv1h^:GKpsU"
 559,1
 928,0
 593,
@@ -19,7 +19,7 @@
 567,","
 588,"."
 589,","
-568,""
+568,""""
 570,
 571,
 569,0
@@ -27,7 +27,7 @@
 599,1000
 560,6
 pDays
-PSkip1
+pSkip1
 pSkip2
 pSkip3
 pSkip4
@@ -41,14 +41,14 @@ pSkip5
 2
 590,6
 pDays,0
-PSkip1,""
+pSkip1,"UTILITY - Get Chore Flag"
 pSkip2,""
 pSkip3,""
 pSkip4,""
 pSkip5,""
 637,6
 pDays,""
-PSkip1,""
+pSkip1,""
 pSkip2,""
 pSkip3,""
 pSkip4,""
@@ -66,7 +66,8 @@ vFileContent
 582,1
 VarType=32ColType=827
 603,0
-572,57
+572,59
+
 #
 #     Process: ADMIN - Monitor Log Folder Error Files
 #     Purpose: To search thrugh server log files to find any process error files generated within the specified time period (default 1 day)  
@@ -109,7 +110,7 @@ sBeginDate = TimSt(nStartDateSerial, '\m/\d/\Y');
 #Sample command syntax
 #.\script.ps1 -TargetDir "C:\Logs" -OutputFile "C:\Output.txt" -Days 2 -SkipString1 "" -SkipString2 "" -SkipString3 "" -SkipString4 "" -SkipString5 ""
 
-#Linux powershell command to execute script
+#Powershell command to execute script
 sCmd = 'powershell.exe -ExecutionPolicy RemoteSigned -File '  | cDoubleQuotes | sScript  | cDoubleQuotes | ' -TargetDir ' | cDoubleQuotes | pLogDirectory | cDoubleQuotes| ' -OutputFile ' | cDoubleQuotes | pDestFile | cDoubleQuotes | ' -Days ' |   NUMBERTOSTRING(pDays) | ' -SkipString1 ' | cDoubleQuotes | pSkip1  | cDoubleQuotes | ' -SkipString2 ' | cDoubleQuotes | pSkip2  | cDoubleQuotes | ' -SkipString3 ' | cDoubleQuotes | pSkip3  | cDoubleQuotes | ' -SkipString4 ' | cDoubleQuotes | pSkip4  | cDoubleQuotes | ' -SkipString5 ' | cDoubleQuotes | pSkip5  | cDoubleQuotes;
 LOGOUTPUT('INFO', 'Command:' | sCmd);
 ExecuteCommand( sCmd,1);
@@ -124,9 +125,10 @@ ENDIF;
 DatasourceType = 'CHARACTERDELIMITED';
 DatasourceNameForServer = pDestFile;
 DatasourceASCIIHeaderRecord = 0;  
+
 573,1
 
-574,10
+574,9
 
 #If not found, continue on to epilog
 IF(nFileFound = 0);
@@ -136,10 +138,7 @@ ELSE;
     nErrorFileCount = nErrorFileCount + 1; 
 ENDIF;
 
-
-575,72
-
-
+575,69
 
 #################################################################
 #
@@ -155,7 +154,7 @@ sPrefix = sAppName | '(' | sEnv |  ')';
 
 
 sProcessName = GETPROCESSNAME ();
-sSendTo = CELLGETS ('zLookup Parameter','Email Send To','Text');
+sSendTo = CELLGETS ('zLookup Parameter','Email Send To Admin','Text');
 
 
 #Formatting body message
@@ -195,7 +194,8 @@ sMsg = sMsg | '<b>Process Exclusions: </b> <br>' | sExclusion | '<br>';
 #If there were no errors log files found, set email subject
 IF(nFileFound = 0);   
     sEmailSubject = 'TM1 ' | sPrefix | ' No Error Log Files Found';
-    sBodyMsg = sBodyMsg | ' NONE <br>' ;
+    # sBodyMsg = sBodyMsg | ' NONE <br>' ;
+    sBodyMsg = '';
 ELSE;
     sEmailSubject = '***WARNING*** TM1 ' | sPrefix | ' Error Log Files Detected';    
 ENDIF;
@@ -205,8 +205,6 @@ sEmailBody = sMsg | sBodyMsg;
 
 #Execute process to send results in an email
 EXECUTEPROCESS ('ADMIN - Send Email','pSendTo',sSendTo,'pFilename','','pEmailSubject',sEmailSubject,'pEmailBody',sEmailBody);
-
-
 
 
 
